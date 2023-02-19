@@ -8,8 +8,8 @@
 10000                     ! 8  tstep
 1.0                       ! 10 fp0 (forcing amplitude)
 0.1                       ! 11 u0
-7                         ! 12 kdn (smallest forced WN -- NOT USED CURRENTLY)
-9                         ! 13 kup (forcing WN)
+7                         ! 12 kdn (smallest forced WN for iflow.eq.4)
+9                         ! 13 kup (largest forcing WN for iflow.eq.4)
 0.000                     ! 14 nu (viscosity)
 0.0                       ! 15 hnu (hypOvisocity)
 1                         ! 16 nn (order of (hypER)viscosity)
