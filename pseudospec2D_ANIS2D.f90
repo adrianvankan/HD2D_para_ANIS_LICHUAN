@@ -504,7 +504,7 @@
 !! COMPUTE M = (<v^2> - <u^2>)/(<u^2> + <v^2>), such that m ~ 1 for Lx >> Ly
      polar1 = (Eky - Ekx)/(Ekx + Eky)
 
-!! COMPUTE <omega(x,y) e^(iy)>
+!! COMPUTE FRACTION OF KINETIC ENERGY IN kx = 0, |ky| = 1.
       tmp       = 1.0d0/dble(nx)**2/dble(ny)**2
       polar2    = 0.0d0
       polar2tmp = 0.0d0
