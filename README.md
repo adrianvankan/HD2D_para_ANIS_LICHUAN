@@ -1,1 +1,1 @@
-# HD2D_para_ANIS_LICHUAN_GITHUB
+ This repository contains modified Fortran code based on the GHOST pseudospectral solver of the 2D Navier-Stokes equation in a periodic rectangular domain. (For more information on the most up to date version of GHOST, please see https://wp.df.uba.ar/mininni/ghost/) 
