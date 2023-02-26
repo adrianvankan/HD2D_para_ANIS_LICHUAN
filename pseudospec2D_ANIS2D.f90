@@ -504,7 +504,7 @@
 !! COMPUTE M = (<v^2> - <u^2>)/(<u^2> + <v^2>), such that m ~ 1 for Lx >> Ly
      polar1 = (Eky - Ekx)/(Ekx + Eky)
 
-!! COMPUTE FRACTION OF KINETIC ENERGY IN kx = 0, |ky| = 1.
+!! COMPUTE FRACTION OF KINETIC ENERGY IN |kx| = 0, |ky| = 1.
       tmp       = 1.0d0/dble(nx)**2/dble(ny)**2
       polar2    = 0.0d0
       polar2tmp = 0.0d0
@@ -514,7 +514,7 @@
          two=2.0d0
          IF (i.eq.1) two=1.0d0
          DO j = 1,ny
-            IF ((abs(ky(j) - 1.0d0).lt.tiny).and.(kx(i).lt.tiny)) THEN
+            IF ((abs(ky(j) - 1.0d0).lt.tiny).and.(abs(kx(i)).lt.tiny)) THEN
                polar2tmp = polar2tmp + two*kk2(j,i)*abs(ps(j,i))**2*tmp/(Ekx + Eky)
             ENDIF
          END DO
@@ -643,7 +643,7 @@
          two=2.0d0
          IF (i.eq.1) two=1.0d0
          DO j = 1,ny
-            kmn = int((sqrt(kk2(j,i))/DQ+.5d0)*DQ)
+            kmn = int((sqrt(kk2(j,i))/DQ+.5d0))
             IF ((kmn.gt.0).and.(kmn.le.nmax/2+1)) THEN
                Ek(kmn) = Ek(kmn)+two*kk2(j,i)*abs(ps(j,i))**2*tmp
             ENDIF
