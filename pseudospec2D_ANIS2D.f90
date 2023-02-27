@@ -514,7 +514,7 @@
          two=2.0d0
          IF (i.eq.1) two=1.0d0
          DO j = 1,ny
-            IF ((abs(ky(j) - 1.0d0).lt.tiny).and.(abs(kx(i)).lt.tiny)) THEN
+            IF (((abs(abs(ky(j)) - 1.0d0)).lt.tiny).and.(abs(kx(i)).lt.tiny)) THEN
                polar2tmp = polar2tmp + two*kk2(j,i)*abs(ps(j,i))**2*tmp/(Ekx + Eky)
             ENDIF
          END DO
@@ -624,7 +624,7 @@
       USE mpivars
       IMPLICIT NONE
 
-      DOUBLE PRECISION, DIMENSION(nmax/2+1)        :: Ek,Ektot1
+      DOUBLE PRECISION, DIMENSION(nmax/2+1)      :: Ek,Ektot1
       DOUBLE COMPLEX, DIMENSION(ny,ista:iend)    :: ps
       DOUBLE PRECISION        :: tmp,two,tmp1,tmp2,tmp3
       INTEGER     :: kin
@@ -643,7 +643,7 @@
          two=2.0d0
          IF (i.eq.1) two=1.0d0
          DO j = 1,ny
-            kmn = int((sqrt(kk2(j,i))/DQ+.5d0))
+            kmn = int(sqrt(kk2(j,i))/DQ+.5d0)
             IF ((kmn.gt.0).and.(kmn.le.nmax/2+1)) THEN
                Ek(kmn) = Ek(kmn)+two*kk2(j,i)*abs(ps(j,i))**2*tmp
             ENDIF
