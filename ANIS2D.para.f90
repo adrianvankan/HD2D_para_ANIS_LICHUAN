@@ -32,18 +32,19 @@
       USE kes
       USE grid
       USE random
+      use iso_fortran_env
       IMPLICIT NONE
 
 !
 ! Integration parameters
 !     ord  : order of the Runge-Kutta method used
 
-      INTEGER, PARAMETER :: ord = 4
-      INTEGER :: ini
-      INTEGER :: step
-      INTEGER :: tstep
-      INTEGER :: cstep
-      INTEGER :: sstep
+      INTEGER, PARAMETER    :: ord = 4
+      INTEGER               :: ini
+      INTEGER(kind=int64)   :: step
+      INTEGER               :: tstep
+      INTEGER               :: cstep
+      INTEGER               :: sstep
 
 !
 ! streamfunction, vector potential, z component 
@@ -511,10 +512,15 @@
                id = 48
                ic = ic+1
             ENDIF
+            IF (jc.eq.58) THEN
+               jc = 48
+               jt = jt+1
+            ENDIF 
+            th= char(jt)           
             c = char(ic)
             d = char(id)
             u = char(iu)
-            ext = c // d // u
+            ext = th // c // d // u
             tmp=1.0d0/dble(nx)/dble(ny)
             DO i = ista,iend
                DO j = 1,ny
@@ -523,7 +529,7 @@
             END DO
             CALL fftp2d_complex_to_real(plancr,C1,R1,MPI_COMM_WORLD)
             OPEN(1,file=trim(odir) // '/ps.' // node // '.' &
-                 // c // d // u // '.out',form='unformatted')
+                // c // d // u // '.out',form='unformatted')
             WRITE(1) R1
             CLOSE(1)
             DO i = ista,iend
@@ -533,7 +539,7 @@
             END DO
             CALL fftp2d_complex_to_real(plancr,C1,R1,MPI_COMM_WORLD)
             OPEN(1,file=trim(odir) // '/ww.' // node // '.' &
-                 // c // d // u // '.out',form='unformatted')
+                // c // d // u // '.out',form='unformatted')
             WRITE(1) R1
             CLOSE(1)
            IF (myrank.eq.0) THEN
@@ -541,7 +547,7 @@
            WRITE(1,12) c//d//u,time
 !   10      FORMAT( I10,   A30)
 !   11      FORMAT( F12.6, A30)
-   12      FORMAT( A3,    F12.6) 
+   12      FORMAT( A4,    F12.3) 
            CLOSE(1)
            ENDIF      
 
