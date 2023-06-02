@@ -1,4 +1,5 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! THIS VERSION MAKES A LOOP OVER REALIZATIONS
 ! This Fortran code is based on the Geophysical High-Order Suite for Turbulence
 ! (GHOST: http://wp.df.uba.ar/mininni/ghost/) by Pablo Minnini
 ! 
@@ -16,7 +17,7 @@
 ! m ~ 0  E_ls_y >> 1 correspond to a strong large-scale vortex, while
 ! m > 0, E_ls_y << 1 correspond to a pure unidirectional flow in the y direction (e.g. for Qx<<1, Qy=1)
 !
-! Modified by Adrian van Kan (02/18/2023)
+! Modified by Adrian van Kan (06/02/2023)
 
 !=================================================================
       PROGRAM ANIS2D
@@ -299,7 +300,8 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       seed = 2*ireal
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-      IF (stat.eq.0) THEN
+!!! INITIALIZATION OF STREAMFUNCTION !!!!!!
+     IF (stat.eq.0) THEN
          ini = 1
          timet = tstep
          timec = cstep
