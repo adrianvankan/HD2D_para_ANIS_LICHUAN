@@ -1077,8 +1077,7 @@
 !-----------------------------------------------------------------
 !       This subroutine creates random forcing in arbitrary shell [kdn,kup]
 !       It is called if iflow == 4.
-!       kin == 0   for vz
-!           == 1   for ps
+!       kin == 1   for ps
       USE var
       USE mpivars
       USE kes
@@ -1095,19 +1094,33 @@
 
       CALL MPI_BCAST(seed,1,MPI_INTEGER,0,MPI_COMM_WORLD,ierr)
       seed1=seed+myrank
-
+     
       DO i = ista,iend
          DO j = 1,ny
                kh = SQRT(kk2(j,i))
                IF ((kh.le.kup).and.(kh.ge.kdn)) THEN
                   dump = 1.0d0
-                  IF (i.eq.1) dump=0.0d0
+                  !IF (i.eq.1) dump=0.0d0
                   phase = 2*pi*randu(seed1)
                   fp(j,i) = (COS(phase)+im*SIN(phase))*dump
                ELSE
                   fp(j,i) = 0.
                ENDIF
          END DO
+
+         ! MAKE SURE THAT the kx = 0 modes satisfy f(-ky,kx=0) = conjug(f(ky,kx=0))
+         IF (ista.eq.1) THEN
+         DO j = 1,ny/2+1
+            IF ((sqrt(kk2(j,1)).le.kup).and.(sqrt(kk2(j,1)).ge.kdn)) THEN
+             seed1   = seed1 + 1
+             phase   = 2*pi*randu(seed1)
+             fp(j,i) = (COS(phase)+im*SIN(phase))*dump
+           ELSE
+             fp(j,1) = 0.0d0
+            ENDIF
+             fp(ny-j+2,1) = CONJG(fp(j,1))
+         END DO
+         ENDIF
       END DO
 
       CALL energy(fp,tmp,1)
