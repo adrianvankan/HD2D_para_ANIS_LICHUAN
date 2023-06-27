@@ -551,12 +551,8 @@
             call MPI_BSEND(ps21r,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
             call MPI_BSEND(ps21i,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
             ENDIF
-         ENDDO
-      ENDDO      
 
       !STORE MODES FOR TRANSITION 2n jets to 2(n+1) jets
-      DO i = ista,iend
-         DO j = 1,ny
             IF ((abs(kx(i)-(Qx*int(Qy/Qx))).lt.tiny).and.(abs(ky(j)).lt.tiny)) THEN
             psQy0r = REAL(ps(j,i))/tmp
             psQy0i = AIMAG(ps(j,i))/tmp

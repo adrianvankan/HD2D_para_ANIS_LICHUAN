@@ -540,7 +540,7 @@
            IF (myrank.eq.0) THEN
             OPEN(1,file='time_spec.txt',position='append')
             WRITE(1,13) ext4,time
-   13       FORMAT( A4,    F12.6)
+   13       FORMAT( A4,    F12.3)
             CLOSE(1)
            ENDIF
          ENDIF
