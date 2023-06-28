@@ -464,11 +464,13 @@
 
       IMPLICIT NONE
 
-      DOUBLE COMPLEX, DIMENSION(ny,ista:iend) ::ps,fp
-      DOUBLE COMPLEX, DIMENSION(ny,ista:iend) :: C1
+      DOUBLE COMPLEX, DIMENSION(ny,ista:iend)      :: ps,fp
+      DOUBLE COMPLEX, DIMENSION(ny,ista:iend)      :: C1
       DOUBLE PRECISION, DIMENSION(nx,jsta:jend)    :: R1
       DOUBLE PRECISION    :: ps01r,ps11r,ps21r,psQy0r,ps2Qy0r,psQy1r
+      DOUBLE PRECISION    :: ps11rf,ps21rf,psQy0rf,ps2Qy0rf,psQy1rf
       DOUBLE PRECISION    :: ps01i,ps11i,ps21i,psQy0i,ps2Qy0i,psQy1i
+      DOUBLE PRECISION    :: ps11if,ps21if,psQy0if,ps2Qy0if,psQy1if 
       DOUBLE PRECISION    :: Ep1,Ep2,Epv,Eph
       DOUBLE PRECISION    :: Ek1,Ek2
       DOUBLE PRECISION    :: Ekx, Eky, polar1, polar2tmp, polar2
@@ -479,7 +481,8 @@
       DOUBLE PRECISION    :: nu,hnu,nuv,hnuv
       DOUBLE PRECISION    :: Efk, Efp, kup, kmn
       DOUBLE PRECISION    :: tmq,tmp,tmp0,tmp1,tmp2,tmp3,tmp4,two,time
-      INTEGER :: i,j,nn,mm
+      INTEGER             :: i,j,nn,mm,ra1,ra2,ra3,ra4,ra5,ra6
+      
 
 
 !! ENERGY
@@ -524,60 +527,73 @@
       CALL MPI_REDUCE(polar2tmp,polar2,1,MPI_DOUBLE_PRECISION,MPI_SUM,0, &
                       MPI_COMM_WORLD,ierr)
 
+
+      ps01r   = 0.0d0
+      ps01i   = 0.0d0
+      ps11r   = 0.0d0
+      ps11i   = 0.0d0
+      ps21r   = 0.0d0
+      ps21i   = 0.0d0
+      psQy0r  = 0.0d0
+      psQy0i  = 0.0d0
+      ps2Qy0r = 0.0d0
+      ps2Qy0i = 0.0d0
+      psQy1r  = 0.0d0
+      psQy1i  = 0.0d0
+
       !STORE MODES FOR TRANSITION LSV TO 2 JETS        
       tmp = dble(nx)*dble(ny)
       DO i = ista,iend
          DO j = 1,ny
+           !STORE MODES FOR TRANSITION LSV TO 2 JETS            
             IF ((abs(kx(i)).lt.tiny).and.(abs(ky(j)-Qy).lt.tiny)) THEN
-            ps01r = REAL(ps(j,i))/tmp
-            ps01i = AIMAG(ps(j,i))/tmp
-            !print*,'kx,ky,myrank,psr,psi',kx(i),ky(j),myrank,ps01r,ps01i
-            call MPI_BSEND(ps01r,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
-            call MPI_BSEND(ps01i,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
+            ps01r = sqrt(kk2(j,i))*REAL(ps(j,i))/tmp
+            ps01i = sqrt(kk2(j,i))*AIMAG(ps(j,i))/tmp
             ENDIF
 
             IF ((abs(kx(i)-Qx).lt.tiny).and.(abs(ky(j)-Qy).lt.tiny)) THEN
-            ps11r = REAL(ps(j,i))/tmp
-            ps11i = AIMAG(ps(j,i))/tmp
-            !print*,'kx,ky,myrank,psr,psi',kx(i),ky(j),myrank,ps11r,ps11i   
-            call MPI_BSEND(ps11r,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
-            call MPI_BSEND(ps11i,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
+            ps11r = sqrt(kk2(j,i))*REAL(ps(j,i))/tmp
+            ps11i = sqrt(kk2(j,i))*AIMAG(ps(j,i))/tmp
             ENDIF
 
             IF ((abs(kx(i)-2*Qx).lt.tiny).and.(abs(ky(j)-Qy).lt.tiny)) THEN
-            ps21r = REAL(ps(j,i))/tmp
-            ps21i = AIMAG(ps(j,i))/tmp
-            !print*,'kx,ky,myrank,psr,psi',kx(i),ky(j),myrank,ps21r,ps21i  
-            call MPI_BSEND(ps21r,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
-            call MPI_BSEND(ps21i,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
+            ps21r = sqrt(kk2(j,i))*REAL(ps(j,i))/tmp
+            ps21i = sqrt(kk2(j,i))*AIMAG(ps(j,i))/tmp
             ENDIF
 
-      !STORE MODES FOR TRANSITION 2n jets to 2(n+1) jets
+           !STORE MODES FOR TRANSITION 2 jets to 4 jets
             IF ((abs(kx(i)-(Qx*int(Qy/Qx))).lt.tiny).and.(abs(ky(j)).lt.tiny)) THEN
-            psQy0r = REAL(ps(j,i))/tmp
-            psQy0i = AIMAG(ps(j,i))/tmp
-            !print*,'kx,ky,myrank,psQy0r,psQy0i',kx(i),ky(j),myrank,psQy0r,psQy0i
-            call MPI_BSEND(psQy0r,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
-            call MPI_BSEND(psQy0i,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
+            psQy0r = sqrt(kk2(j,i))*REAL(ps(j,i))/tmp
+            psQy0i = sqrt(kk2(j,i))*AIMAG(ps(j,i))/tmp
             ENDIF
 
             IF ((abs(kx(i)-(2*Qx*int(Qy/Qx))).lt.tiny).and.(abs(ky(j)).lt.tiny)) THEN
-            ps2Qy0r = REAL(ps(j,i))/tmp
-            ps2Qy0i = AIMAG(ps(j,i))/tmp
-            !print*,'kx,ky,myrank,psQy0r,psQy0i',kx(i),ky(j),myrank,ps2Qy0r,ps2Qy0i     
-            call MPI_BSEND(ps2Qy0r,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
-            call MPI_BSEND(ps2Qy0i,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
+            ps2Qy0r = sqrt(kk2(j,i))*REAL(ps(j,i))/tmp
+            ps2Qy0i = sqrt(kk2(j,i))*AIMAG(ps(j,i))/tmp
             ENDIF
 
             IF ((abs(kx(i)-(Qx*int(Qy/Qx))).lt.tiny).and.(abs(ky(j)-Qy).lt.tiny)) THEN
-            psQy1r = REAL(ps(j,i))/tmp
-            psQy1i = AIMAG(ps(j,i))/tmp
-            !print*,'kx,ky,myrank,psQy0r,psQy0i',kx(i),ky(j),myrank,psQy1r,psQy1i    
-            call MPI_BSEND(psQy1r,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
-            call MPI_BSEND(psQy1i,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
+            psQy1r = sqrt(kk2(j,i))*REAL(ps(j,i))/tmp
+            psQy1i = sqrt(kk2(j,i))*AIMAG(ps(j,i))/tmp
             ENDIF
          ENDDO
       ENDDO
+
+
+      CALL MPI_REDUCE(ps11r,ps11rf,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+      CALL MPI_REDUCE(ps11i,ps11if,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+
+      CALL MPI_REDUCE(ps21r,ps21rf,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+      CALL MPI_REDUCE(ps21i,ps21if,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+
+      CALL MPI_REDUCE(psQy0r,psQy0rf,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+      CALL MPI_REDUCE(psQy0i,psQy0if,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+
+      CALL MPI_REDUCE(ps2Qy0r,ps2Qy0rf,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+      CALL MPI_REDUCE(ps2Qy0i,ps2Qy0if,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+
+      CALL MPI_REDUCE(psQy1r,psQy1rf,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+      CALL MPI_REDUCE(psQy1i,psQy1if,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
 
 !!!!!!!!!!! Computes the energy at largest scale!!!!!!!!!!!!!!
 !      tmp = 1.0d0/dble(nx)**2/dble(ny)**2
@@ -659,12 +675,12 @@
          CLOSE(1)
 
          OPEN(1,file='modal_amplitudes_lsv_to_jet.txt',position='append')
-         WRITE(1,25) time, ps01r, ps01i, ps11r, ps11i, ps21r, ps21i
+         WRITE(1,25) time, ps01r, ps01i, ps11rf, ps11if, ps21rf, ps21if
    25    FORMAT(E23.14E3,E23.14E3,E23.14E3,E23.14E3,E23.14E3,E23.14E3,E23.14E3)
          CLOSE(1)
 
          OPEN(1,file='modal_amplitudes_njets_to_n_plus_two_jets.txt',position='append')
-         WRITE(1,26) time, psQy0r, psQy0i, ps2Qy0r, ps2Qy0i, psQy1r, psQy1r
+         WRITE(1,26) time, psQy0rf,psQy0if,ps2Qy0rf,ps2Qy0if,psQy1rf,psQy1rf
    26    FORMAT(E23.14E3,E23.14E3,E23.14E3,E23.14E3,E23.14E3,E23.14E3,E23.14E3)
          CLOSE(1)
 
