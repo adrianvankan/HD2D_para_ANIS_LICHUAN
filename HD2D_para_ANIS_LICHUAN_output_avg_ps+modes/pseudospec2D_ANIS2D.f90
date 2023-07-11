@@ -908,7 +908,6 @@
          END DO
       END DO
 
-
       tmp=maxval(r3) !max energy density
       call MPI_REDUCE(tmp,tmp1,1,MPI_DOUBLE_PRECISION,MPI_MAX,0,MPI_COMM_WORLD,ierr)
       call MPI_BCAST(tmp1,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,ierr)
@@ -1172,7 +1171,7 @@
       IMPLICIT NONE
 !
       DOUBLE COMPLEX, DIMENSION(ny,ista:iend) :: fp
-      INTEGER :: i,j,seed,seed1,kin
+      INTEGER                 :: i,j,seed,seed1,kin
       DOUBLE PRECISION        :: tmp,kdn,kup,fp0,energyfp,energyfp2,kh
       DOUBLE PRECISION        :: dt,tmp1,tmp2,two,phase,theta,dump
 
@@ -1183,8 +1182,8 @@
          DO j = 1,ny
                kh = SQRT(kk2(j,i))
                IF ((kh.le.kup).and.(kh.ge.kdn)) THEN
+                  seed1 = seed1 + 1 
                   dump = 1.0d0
-                  !IF (i.eq.1) dump=0.0d0
                   phase = 2*pi*randu(seed1)
                   fp(j,i) = (COS(phase)+im*SIN(phase))*dump
                ELSE
@@ -1198,7 +1197,7 @@
             IF ((sqrt(kk2(j,1)).le.kup).and.(sqrt(kk2(j,1)).ge.kdn)) THEN
              seed1   = seed1 + 1
              phase   = 2*pi*randu(seed1)
-             fp(j,i) = (COS(phase)+im*SIN(phase))*dump
+             fp(j,1) = (COS(phase)+im*SIN(phase))*dump
            ELSE
              fp(j,1) = 0.0d0
             ENDIF

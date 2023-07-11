@@ -1100,7 +1100,7 @@
                kh = SQRT(kk2(j,i))
                IF ((kh.le.kup).and.(kh.ge.kdn)) THEN
                   dump = 1.0d0
-                  !IF (i.eq.1) dump=0.0d0
+                  seed = seed1 + 1
                   phase = 2*pi*randu(seed1)
                   fp(j,i) = (COS(phase)+im*SIN(phase))*dump
                ELSE
@@ -1114,7 +1114,7 @@
             IF ((sqrt(kk2(j,1)).le.kup).and.(sqrt(kk2(j,1)).ge.kdn)) THEN
              seed1   = seed1 + 1
              phase   = 2*pi*randu(seed1)
-             fp(j,i) = (COS(phase)+im*SIN(phase))*dump
+             fp(j,1) = (COS(phase)+im*SIN(phase))*dump
            ELSE
              fp(j,1) = 0.0d0
             ENDIF

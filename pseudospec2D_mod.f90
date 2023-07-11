@@ -9,7 +9,7 @@
 ! n: number of points in the spatial grid
 ! choose: 128   256  512  1024  2048  4096  8192  16384
       INTEGER :: nx = 128
-      INTEGER :: ny = 128
+      INTEGER :: ny = 64
       INTEGER :: nmax
       DOUBLE PRECISION :: Qx,Qy,DQ
       SAVE
