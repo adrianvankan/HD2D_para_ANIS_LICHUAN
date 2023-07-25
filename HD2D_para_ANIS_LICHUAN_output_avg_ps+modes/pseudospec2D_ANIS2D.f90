@@ -527,7 +527,6 @@
       CALL MPI_REDUCE(polar2tmp,polar2,1,MPI_DOUBLE_PRECISION,MPI_SUM,0, &
                       MPI_COMM_WORLD,ierr)
 
-
       ps01r   = 0.0d0
       ps01i   = 0.0d0
       ps11r   = 0.0d0
@@ -670,8 +669,8 @@
          CLOSE(1)
          
          OPEN(1,file='polarization.txt',position='append')
-         WRITE(1,24) time, polar1, polar2
-   24    FORMAT( E23.14E3, E23.14E3, E24.14E3)
+         WRITE(1,24) time, polar1, polar2, Ekx, Eky
+   24    FORMAT( E23.14E3, E23.14E3, E24.14E3, E24.14E3, E24.14E3)
          CLOSE(1)
 
          OPEN(1,file='modal_amplitudes_lsv_to_jet.txt',position='append')

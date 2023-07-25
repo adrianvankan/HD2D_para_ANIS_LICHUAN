@@ -416,9 +416,9 @@
          ENDIF ! iflow
          seed = seed + 1
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         CALL energy(ps,ener,1)
+!       CALL energy(ps,ener,1)
 !           IF (myrank.eq.0) THEN
-        print*, "DBG pre RK:",ener
+!        print*, "DBG pre RK:",ener
 !          ENDIF
 !
 ! Time integration scheme starts here
