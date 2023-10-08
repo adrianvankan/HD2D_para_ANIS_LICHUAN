@@ -465,12 +465,13 @@
       IMPLICIT NONE
 
       DOUBLE COMPLEX, DIMENSION(ny,ista:iend)      :: ps,fp
-      DOUBLE COMPLEX, DIMENSION(ny,ista:iend)      :: C1
+      DOUBLE COMPLEX, DIMENSION(ny,ista:iend)      :: C1,C2,C3
       DOUBLE PRECISION, DIMENSION(nx,jsta:jend)    :: R1
       DOUBLE PRECISION    :: ps01r,ps11r,ps21r,psQy0r,ps2Qy0r,psQy1r
       DOUBLE PRECISION    :: ps11rf,ps21rf,psQy0rf,ps2Qy0rf,psQy1rf
       DOUBLE PRECISION    :: ps01i,ps11i,ps21i,psQy0i,ps2Qy0i,psQy1i
       DOUBLE PRECISION    :: ps11if,ps21if,psQy0if,ps2Qy0if,psQy1if 
+      DOUBLE PRECISION    :: T01, T10, T01f, T10f
       DOUBLE PRECISION    :: Ep1,Ep2,Epv,Eph
       DOUBLE PRECISION    :: Ek1,Ek2
       DOUBLE PRECISION    :: Ekx, Eky, polar1, polar2tmp, polar2
@@ -594,6 +595,25 @@
       CALL MPI_REDUCE(psQy1r,psQy1rf,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
       CALL MPI_REDUCE(psQy1i,psQy1if,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
 
+
+!! COMPUTE full nonlinear transfer to first (Qx,0) and second (0,Qy) modes
+      CALL laplak2(ps,C1)               ! make - w_z
+      CALL poisson(ps,C2,C3)            ! - ez.curl(u_z x w_z)
+
+      DO i = ista,iend
+         DO j = 1,ny
+            IF (((abs(kx(i)-Qx)).lt.tiny).and.(abs(ky(j)).lt.tiny)) THEN
+               T10 = REAL(C3(j,i)*ps(j,i))/tmp**2
+            ENDIF
+            IF ((abs(kx(i)).lt.tiny).and.(abs(ky(j)-Qy).lt.tiny)) THEN
+               T01 = REAL(C3(j,i)*ps(j,i))/tmp**2
+            ENDIF
+         ENDDO
+      ENDDO
+     
+      CALL MPI_REDUCE(T10,T10f,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+      CALL MPI_REDUCE(T01,T01f,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+
 !!!!!!!!!!! Computes the energy at largest scale!!!!!!!!!!!!!!
 !      tmp = 1.0d0/dble(nx)**2/dble(ny)**2
 !      tmp1=0.0d0
@@ -683,6 +703,10 @@
    26    FORMAT(E23.14E3,E23.14E3,E23.14E3,E23.14E3,E23.14E3,E23.14E3,E23.14E3)
          CLOSE(1)
 
+         OPEN(1,file='nl_transfers_to_ls.txt',position='append')
+         WRITE(1,27) time, T01f, T10f
+   27    FORMAT(E23.14E3,E23.14E3,E23.14E3)
+         CLOSE(1)
       ENDIF
       
       RETURN
