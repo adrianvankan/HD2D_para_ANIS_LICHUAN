@@ -603,10 +603,10 @@
       DO i = ista,iend
          DO j = 1,ny
             IF (((abs(kx(i)-Qx)).lt.tiny).and.(abs(ky(j)).lt.tiny)) THEN
-               T10 = REAL(C3(j,i)*ps(j,i))/tmp**2
+               T10 = REAL(C3(j,i)*CONJG(ps(j,i)))/tmp**2
             ENDIF
             IF ((abs(kx(i)).lt.tiny).and.(abs(ky(j)-Qy).lt.tiny)) THEN
-               T01 = REAL(C3(j,i)*ps(j,i))/tmp**2
+               T01 = REAL(C3(j,i)*CONJG(ps(j,i)))/tmp**2
             ENDIF
          ENDDO
       ENDDO
