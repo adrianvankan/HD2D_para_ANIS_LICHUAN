@@ -464,9 +464,14 @@
 
       IMPLICIT NONE
 
-      DOUBLE COMPLEX, DIMENSION(ny,ista:iend) ::ps,fp
-      DOUBLE COMPLEX, DIMENSION(ny,ista:iend) :: C1
+      DOUBLE COMPLEX, DIMENSION(ny,ista:iend)      :: ps,fp
+      DOUBLE COMPLEX, DIMENSION(ny,ista:iend)      :: C1,C2,C3
       DOUBLE PRECISION, DIMENSION(nx,jsta:jend)    :: R1
+      DOUBLE PRECISION    :: ps01r,ps11r,ps21r,psQy0r,ps2Qy0r,psQy1r
+      DOUBLE PRECISION    :: ps11rf,ps21rf,psQy0rf,ps2Qy0rf,psQy1rf
+      DOUBLE PRECISION    :: ps01i,ps11i,ps21i,psQy0i,ps2Qy0i,psQy1i
+      DOUBLE PRECISION    :: ps11if,ps21if,psQy0if,ps2Qy0if,psQy1if 
+      DOUBLE PRECISION    :: T01, T10, T01f, T10f
       DOUBLE PRECISION    :: Ep1,Ep2,Epv,Eph
       DOUBLE PRECISION    :: Ek1,Ek2
       DOUBLE PRECISION    :: Ekx, Eky, polar1, polar2tmp, polar2
@@ -477,7 +482,8 @@
       DOUBLE PRECISION    :: nu,hnu,nuv,hnuv
       DOUBLE PRECISION    :: Efk, Efp, kup, kmn
       DOUBLE PRECISION    :: tmq,tmp,tmp0,tmp1,tmp2,tmp3,tmp4,two,time
-      INTEGER :: i,j,nn,mm
+      INTEGER             :: i,j,nn,mm,ra1,ra2,ra3,ra4,ra5,ra6
+      
 
 
 !! ENERGY
@@ -521,6 +527,92 @@
       END DO
       CALL MPI_REDUCE(polar2tmp,polar2,1,MPI_DOUBLE_PRECISION,MPI_SUM,0, &
                       MPI_COMM_WORLD,ierr)
+
+      ps01r   = 0.0d0
+      ps01i   = 0.0d0
+      ps11r   = 0.0d0
+      ps11i   = 0.0d0
+      ps21r   = 0.0d0
+      ps21i   = 0.0d0
+      psQy0r  = 0.0d0
+      psQy0i  = 0.0d0
+      ps2Qy0r = 0.0d0
+      ps2Qy0i = 0.0d0
+      psQy1r  = 0.0d0
+      psQy1i  = 0.0d0
+
+      !STORE MODES FOR TRANSITION LSV TO 2 JETS        
+      tmp = dble(nx)*dble(ny)
+      DO i = ista,iend
+         DO j = 1,ny
+           !STORE MODES FOR TRANSITION LSV TO 2 JETS            
+            IF ((abs(kx(i)).lt.tiny).and.(abs(ky(j)-Qy).lt.tiny)) THEN
+            ps01r = sqrt(kk2(j,i))*REAL(ps(j,i))/tmp
+            ps01i = sqrt(kk2(j,i))*AIMAG(ps(j,i))/tmp
+            ENDIF
+
+            IF ((abs(kx(i)-Qx).lt.tiny).and.(abs(ky(j)-Qy).lt.tiny)) THEN
+            ps11r = sqrt(kk2(j,i))*REAL(ps(j,i))/tmp
+            ps11i = sqrt(kk2(j,i))*AIMAG(ps(j,i))/tmp
+            ENDIF
+
+            IF ((abs(kx(i)-2*Qx).lt.tiny).and.(abs(ky(j)-Qy).lt.tiny)) THEN
+            ps21r = sqrt(kk2(j,i))*REAL(ps(j,i))/tmp
+            ps21i = sqrt(kk2(j,i))*AIMAG(ps(j,i))/tmp
+            ENDIF
+
+           !STORE MODES FOR TRANSITION 2 jets to 4 jets
+            IF ((abs(kx(i)-(Qx*int(Qy/Qx))).lt.tiny).and.(abs(ky(j)).lt.tiny)) THEN
+            psQy0r = sqrt(kk2(j,i))*REAL(ps(j,i))/tmp
+            psQy0i = sqrt(kk2(j,i))*AIMAG(ps(j,i))/tmp
+            ENDIF
+
+            IF ((abs(kx(i)-(2*Qx*int(Qy/Qx))).lt.tiny).and.(abs(ky(j)).lt.tiny)) THEN
+            ps2Qy0r = sqrt(kk2(j,i))*REAL(ps(j,i))/tmp
+            ps2Qy0i = sqrt(kk2(j,i))*AIMAG(ps(j,i))/tmp
+            ENDIF
+
+            IF ((abs(kx(i)-(Qx*int(Qy/Qx))).lt.tiny).and.(abs(ky(j)-Qy).lt.tiny)) THEN
+            psQy1r = sqrt(kk2(j,i))*REAL(ps(j,i))/tmp
+            psQy1i = sqrt(kk2(j,i))*AIMAG(ps(j,i))/tmp
+            ENDIF
+         ENDDO
+      ENDDO
+
+
+      CALL MPI_REDUCE(ps11r,ps11rf,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+      CALL MPI_REDUCE(ps11i,ps11if,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+
+      CALL MPI_REDUCE(ps21r,ps21rf,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+      CALL MPI_REDUCE(ps21i,ps21if,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+
+      CALL MPI_REDUCE(psQy0r,psQy0rf,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+      CALL MPI_REDUCE(psQy0i,psQy0if,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+
+      CALL MPI_REDUCE(ps2Qy0r,ps2Qy0rf,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+      CALL MPI_REDUCE(ps2Qy0i,ps2Qy0if,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+
+      CALL MPI_REDUCE(psQy1r,psQy1rf,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+      CALL MPI_REDUCE(psQy1i,psQy1if,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+
+
+!! COMPUTE full nonlinear transfer to first (Qx,0) and second (0,Qy) modes
+      CALL laplak2(ps,C1)               ! make - w_z
+      CALL poisson(ps,C1,C3)            ! - ez.curl(u_z x w_z)
+
+      DO i = ista,iend
+         DO j = 1,ny
+            IF (((abs(kx(i)-Qx)).lt.tiny).and.(abs(ky(j)).lt.tiny)) THEN
+               T10 = -1.0d0*REAL(C3(j,i)*CONJG(ps(j,i)))/tmp**2
+            ENDIF
+            IF ((abs(kx(i)).lt.tiny).and.(abs(ky(j)-Qy).lt.tiny)) THEN
+               T01 = -1.0d0*REAL(C3(j,i)*CONJG(ps(j,i)))/tmp**2
+            ENDIF
+         ENDDO
+      ENDDO
+     
+      CALL MPI_REDUCE(T10,T10f,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
+      CALL MPI_REDUCE(T01,T01f,1,MPI_DOUBLE_PRECISION,MPI_SUM,0,MPI_COMM_WORLD,ierr)
 
 !!!!!!!!!!! Computes the energy at largest scale!!!!!!!!!!!!!!
 !      tmp = 1.0d0/dble(nx)**2/dble(ny)**2
@@ -597,8 +689,23 @@
          CLOSE(1)
          
          OPEN(1,file='polarization.txt',position='append')
-         WRITE(1,24) time, polar1, polar2
-   24    FORMAT( E23.14E3, E23.14E3, E24.14E3)
+         WRITE(1,24) time, polar1, polar2, Ekx, Eky
+   24    FORMAT( E23.14E3, E23.14E3, E24.14E3, E24.14E3, E24.14E3)
+         CLOSE(1)
+
+         OPEN(1,file='modal_amplitudes_lsv_to_jet.txt',position='append')
+         WRITE(1,25) time, ps01r, ps01i, ps11rf, ps11if, ps21rf, ps21if
+   25    FORMAT(E23.14E3,E23.14E3,E23.14E3,E23.14E3,E23.14E3,E23.14E3,E23.14E3)
+         CLOSE(1)
+
+         OPEN(1,file='modal_amplitudes_njets_to_n_plus_two_jets.txt',position='append')
+         WRITE(1,26) time, psQy0rf,psQy0if,ps2Qy0rf,ps2Qy0if,psQy1rf,psQy1rf
+   26    FORMAT(E23.14E3,E23.14E3,E23.14E3,E23.14E3,E23.14E3,E23.14E3,E23.14E3)
+         CLOSE(1)
+
+         OPEN(1,file='nl_transfers_to_ls.txt',position='append')
+         WRITE(1,27) time, T01f, T10f
+   27    FORMAT(E23.14E3,E23.14E3,E23.14E3)
          CLOSE(1)
       ENDIF
       
@@ -823,7 +930,6 @@
             r3(i,j) = r1(i,j)*r1(i,j)+r2(i,j)*r2(i,j)
          END DO
       END DO
-
 
       tmp=maxval(r3) !max energy density
       call MPI_REDUCE(tmp,tmp1,1,MPI_DOUBLE_PRECISION,MPI_MAX,0,MPI_COMM_WORLD,ierr)
@@ -1088,7 +1194,7 @@
       IMPLICIT NONE
 !
       DOUBLE COMPLEX, DIMENSION(ny,ista:iend) :: fp
-      INTEGER :: i,j,seed,seed1,kin
+      INTEGER                 :: i,j,seed,seed1,kin
       DOUBLE PRECISION        :: tmp,kdn,kup,fp0,energyfp,energyfp2,kh
       DOUBLE PRECISION        :: dt,tmp1,tmp2,two,phase,theta,dump
 
@@ -1099,8 +1205,8 @@
          DO j = 1,ny
                kh = SQRT(kk2(j,i))
                IF ((kh.le.kup).and.(kh.ge.kdn)) THEN
+                  seed1 = seed1 + 1 
                   dump = 1.0d0
-                  seed = seed1 + 1
                   phase = 2*pi*randu(seed1)
                   fp(j,i) = (COS(phase)+im*SIN(phase))*dump
                ELSE
@@ -1130,3 +1236,100 @@
       CALL MPI_BCAST(seed,1,MPI_INTEGER,0,MPI_COMM_WORLD,ierr)
 
       END SUBROUTINE rand_force_broad
+
+
+
+
+!*****************************************************************
+      SUBROUTINE yavg_ps_ww(ps,C,R,ext,odir)
+!-----------------------------------------------------------------
+!
+! Computes the energy power spectrum in 2D.
+! The output is written to a file by the first node.
+!
+! Parameters
+!     a  : streamfunction
+!     b  : vector potential
+!     ext: the extension used when writting the file
+!
+      USE kes
+      USE grid
+      USE mpivars
+      USE fft
+      USE grid
+      USE ali
+      
+      IMPLICIT NONE
+
+      DOUBLE PRECISION, DIMENSION(nx)            :: psyavg
+      DOUBLE PRECISION, DIMENSION(nmax/2+1)      :: Ek,Ektot1
+      DOUBLE COMPLEX, DIMENSION(ny,ista:iend)    :: ps,C
+      DOUBLE PRECISION, DIMENSION(nx,jsta:jend)  :: R
+      DOUBLE PRECISION        :: tmp,two,tmp1,tmp2,tmp3
+      INTEGER     :: kin
+      INTEGER     :: kmn
+      INTEGER     :: i,j
+      CHARACTER*4 :: ext
+      CHARACTER*100 :: odir
+
+     !COPY STREAMFUNCTION
+     CALL derivk2(ps,C,0)
+
+      DO j=1,ny
+       DO i=ista,iend
+         IF (ky(j).gt.(1.0d0-tiny)) THEN
+           C(j,i) = 0.0d0
+         ENDIF
+       ENDDO
+      ENDDO
+
+      tmp=1.0d0/dble(nx)/dble(ny)
+      DO i = ista,iend
+       DO j = 1,ny
+          C(j,i) = C(j,i)*tmp
+       END DO
+      END DO
+      CALL fftp2d_complex_to_real(plancr,C,R,MPI_COMM_WORLD)
+     
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+      IF (myrank.eq.0) THEN
+         OPEN(1,file=trim(odir) // '/yavg_ps.' // ext // '.txt')
+         do i=1,nx
+         WRITE(1,55) R(i,1)
+         enddo
+         CLOSE(1) 
+      ENDIF
+
+      !VORTICITY
+      CALL laplak2(ps,C)
+      DO j=1,ny
+       DO i=ista,iend
+         IF (ky(j).gt.(1.0d0-tiny)) THEN
+           C(j,i) = 0.0d0
+         ENDIF
+       ENDDO
+      ENDDO
+
+      tmp=1.0d0/dble(nx)/dble(ny)
+      DO i = ista,iend
+       DO j = 1,ny
+          C(j,i) = C(j,i)*tmp
+       END DO
+      END DO
+
+      CALL fftp2d_complex_to_real(plancr,C,R,MPI_COMM_WORLD)
+      IF (myrank.eq.0) THEN
+         OPEN(1,file=trim(odir) // '/yavg_ww.' // ext // '.txt')
+         do i=1,nx
+         WRITE(1,55) R(i,1)
+         enddo
+         CLOSE(1)
+      ENDIF
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  55    FORMAT( E24.15E3,E24.15E3)
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      RETURN
+      END SUBROUTINE yavg_ps_ww

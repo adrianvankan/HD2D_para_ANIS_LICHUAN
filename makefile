@@ -7,8 +7,8 @@
 # When EXTEN is equal to 1 you can use the variable F90EXT 
 # to change the extension of the F90/95 files.
 
-COMP     = mpif90 -c
-LINK     = mpif90 
+COMP     = mpiifort -c
+LINK     = mpiifort 
 UNDER    = 0
 EXTEN    = 0
 APPEND   = _
@@ -16,7 +16,7 @@ F90EXT   = f90
 LMPI     = -lmpi -lm#-limf
 IDIR     = 
 LDIR     =
-FFTWLDIR = /home/adrian/Libraries/fftw-2.1.5/lib/
+FFTWLDIR = /home/einstein/Libraries/fftw-2.1.5/lib/
 LFFTW    = -ldrfftw -ldfftw -L$(FFTWLDIR) 
 SHELL    = /bin/bash
 MAKE     = /usr/bin/make

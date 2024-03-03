@@ -7,7 +7,7 @@
 !
 ! It outputs energy and enstrophy balance files,
 ! energy spectra, fluxes, stream function and vorticity fields, and 
-! calculatures polarization using two measures: 
+! calculatures polarization using flow polarity: 
 !
 ! m = (<v^2> - <u^2>) / (<u^2> + <v^2>)
 ! 
@@ -304,7 +304,6 @@
          DO j = jsta,jend
             DO i = 1,nx
                R1(i,j) = 0.0d0
-               R2(i,j) = 0.0d0
             END DO
          END DO
          DO ir = 1,int(kup)+1
@@ -417,9 +416,9 @@
          ENDIF ! iflow
          seed = seed + 1
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!         CALL energy(ps,ener,1)
+!       CALL energy(ps,ener,1)
 !           IF (myrank.eq.0) THEN
-        !print*, "DBG pre RK:",ener
+!        print*, "DBG pre RK:",ener
 !          ENDIF
 !
 ! Time integration scheme starts here
@@ -490,6 +489,7 @@
             ext4 = th // c // d // u 
            CALL spectrum(ps,ext4,odir)
            CALL transfers(ps,ext4,odir)
+           CALL yavg_ps_ww(ps,C6,R2,ext4,odir)
 
            IF (myrank.eq.0) THEN
             OPEN(1,file='time_spec.txt',position='append')
@@ -559,11 +559,11 @@
          timec2 = timec2+1
 !         timecorr = timecorr+dt
          time = time+dt
-!         CALL energy(ps,ener,1)
+         !CALL energy(ps,ener,1)
 !         CALL energy(phi,enerphi,0)
-!           IF (myrank.eq.0) THEN
-!        print*, "DBG post sstep:",ener,enerphi
-!          ENDIF
+           !IF (myrank.eq.0) THEN
+        !print*, "DBG post sstep:",ener
+          !ENDIF
 
 
 ! Runge-Kutta step 1
