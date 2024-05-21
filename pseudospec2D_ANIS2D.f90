@@ -267,8 +267,6 @@
             ENDIF
          END DO
       END DO
-
-
       END SUBROUTINE pmult
 
 !#################################################################
@@ -1277,7 +1275,7 @@
 
       DO j=1,ny
        DO i=ista,iend
-         IF (ky(j).gt.(1.0d0-tiny)) THEN
+         IF (abs(ky(j)).gt.(1.0d0-tiny)) THEN
            C(j,i) = 0.0d0
          ENDIF
        ENDDO
@@ -1305,7 +1303,7 @@
       CALL laplak2(ps,C)
       DO j=1,ny
        DO i=ista,iend
-         IF (ky(j).gt.(1.0d0-tiny)) THEN
+         IF (abs(ky(j)).gt.(1.0d0-tiny)) THEN
            C(j,i) = 0.0d0
          ENDIF
        ENDDO
