@@ -231,6 +231,7 @@
       !kmax = (dble(n)/3.d0)**2
       kmax = 1.0d0/9.0d0 !maximum WN when each direction scaled by 1/n_i**2
       nmax = int(max(nx*Qx/DQ,ny*Qy/DQ))
+      print*,nmax
       tiny =  0.000001d0
 
 !
@@ -251,8 +252,10 @@
       DO i = ista,iend
          DO j = 1,ny
          kn2(j,i) = 0.1d0
-         if ((kx(i)**2*tmpx+ky(j)**2*tmpy).ge.kmax) kn2(j,i) = 1.0d0
-         if (abs(kx(i))+abs(ky(j)).lt.tiny) kn2(j,i) = 0.0d0
+         if (kx(i)**2*tmpx + ky(j)**2*tmpy.ge.kmax)      kn2(j,i) = 1.0d0
+         if (abs(kx(j)).ge.dble(nx)/3)                   kn2(j,i) = 1.0d0
+         if (abs(ky(j)).ge.dble(ny)/3)                   kn2(j,i) = 1.0d0
+         if (abs(kx(i))+abs(ky(j)).lt.tiny)              kn2(j,i) = 0.0d0
          ENDDO
       ENDDO 
 !!!!!!!!!!!!!!
@@ -489,7 +492,7 @@
             ext4 = th // c // d // u 
            CALL spectrum(ps,ext4,odir)
            CALL transfers(ps,ext4,odir)
-           CALL yavg_ps_ww(ps,C6,R2,ext4,odir)
+           CALL yavg_ps_ww(ps,C6,R2,Qy,ext4,odir)
 
            IF (myrank.eq.0) THEN
             OPEN(1,file='time_spec.txt',position='append')

@@ -267,6 +267,8 @@
             ENDIF
          END DO
       END DO
+
+
       END SUBROUTINE pmult
 
 !#################################################################
@@ -1239,10 +1241,10 @@
 
 
 !*****************************************************************
-      SUBROUTINE yavg_ps_ww(ps,C,R,ext,odir)
+      SUBROUTINE yavg_ps_ww(ps,C,R,Qytmp,ext,odir)
 !-----------------------------------------------------------------
 !
-! Computes the energy power spectrum in 2D.
+! Computes the yaverage of streamfunction and vorticity.
 ! The output is written to a file by the first node.
 !
 ! Parameters
@@ -1263,7 +1265,7 @@
       DOUBLE PRECISION, DIMENSION(nmax/2+1)      :: Ek,Ektot1
       DOUBLE COMPLEX, DIMENSION(ny,ista:iend)    :: ps,C
       DOUBLE PRECISION, DIMENSION(nx,jsta:jend)  :: R
-      DOUBLE PRECISION        :: tmp,two,tmp1,tmp2,tmp3
+      DOUBLE PRECISION        :: tmp,two,tmp1,tmp2,tmp3,Qytmp
       INTEGER     :: kin
       INTEGER     :: kmn
       INTEGER     :: i,j
@@ -1275,7 +1277,7 @@
 
       DO j=1,ny
        DO i=ista,iend
-         IF (abs(ky(j)).gt.(1.0d0-tiny)) THEN
+         IF (abs(ky(j)).gt.(Qytmp-tiny)) THEN
            C(j,i) = 0.0d0
          ENDIF
        ENDDO
@@ -1303,7 +1305,7 @@
       CALL laplak2(ps,C)
       DO j=1,ny
        DO i=ista,iend
-         IF (abs(ky(j)).gt.(1.0d0-tiny)) THEN
+         IF (abs(ky(j)).gt.(Qytmp-tiny)) THEN
            C(j,i) = 0.0d0
          ENDIF
        ENDDO
