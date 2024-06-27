@@ -1241,7 +1241,7 @@
 
 
 !*****************************************************************
-      SUBROUTINE yavg_ps_ww(ps,C,R,Qytmp,ext,odir)
+      SUBROUTINE yavg_ps_ww(ps,C,R,ext,odir)
 !-----------------------------------------------------------------
 !
 ! Computes the yaverage of streamfunction and vorticity.
@@ -1265,7 +1265,7 @@
       DOUBLE PRECISION, DIMENSION(nmax/2+1)      :: Ek,Ektot1
       DOUBLE COMPLEX, DIMENSION(ny,ista:iend)    :: ps,C
       DOUBLE PRECISION, DIMENSION(nx,jsta:jend)  :: R
-      DOUBLE PRECISION        :: tmp,two,tmp1,tmp2,tmp3,Qytmp
+      DOUBLE PRECISION        :: tmp,two,tmp1,tmp2,tmp3
       INTEGER     :: kin
       INTEGER     :: kmn
       INTEGER     :: i,j
@@ -1277,7 +1277,7 @@
 
       DO j=1,ny
        DO i=ista,iend
-         IF (abs(ky(j)).gt.(Qytmp-tiny)) THEN
+         IF (abs(ky(j)).gt.tiny) THEN
            C(j,i) = 0.0d0
          ENDIF
        ENDDO
@@ -1305,7 +1305,7 @@
       CALL laplak2(ps,C)
       DO j=1,ny
        DO i=ista,iend
-         IF (abs(ky(j)).gt.(Qytmp-tiny)) THEN
+         IF (abs(ky(j)).gt.tiny) THEN
            C(j,i) = 0.0d0
          ENDIF
        ENDDO
